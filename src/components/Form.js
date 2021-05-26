@@ -136,9 +136,8 @@ export default class Form extends Component {
 
             this.state.success.length > 0 &&
             <div className="box">
-            <h2>
-                {this.state.success}
-            </h2>
+                <h2>Quote</h2>
+
             </div>
         }
 
