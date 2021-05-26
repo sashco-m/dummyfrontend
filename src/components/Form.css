@@ -1,0 +1,15 @@
+.box{
+    margin:auto;
+    margin-top:10px;
+    width:20%;
+    border:3px solid green;
+    padding: 10px;
+}
+
+.form-inline{
+    display: flex;
+  flex-flow: row wrap;
+  flex-direction: column;
+    align-items: stretch;
+}
+
