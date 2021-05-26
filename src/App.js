@@ -13,9 +13,14 @@ function App() {
   return (
     <div className="App">
       <Navbar collapseOnSelect bg="light" expand="md" className="mb-3">
-        <LinkContainer to="/">
+      <LinkContainer to="/">
           <Navbar.Brand className="font-weight-bold text-muted">
-            Demo Screens
+            View Orders
+          </Navbar.Brand>
+        </LinkContainer>
+        <LinkContainer to="/placeOrder">
+          <Navbar.Brand className="font-weight-bold text-muted">
+            Place an Order
           </Navbar.Brand>
         </LinkContainer>
       </Navbar>

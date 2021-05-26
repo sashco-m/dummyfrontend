@@ -57,6 +57,7 @@ export default class Form extends Component {
 
   render() {
     return (
+        <div className="outer">
       <div className="box">
         <form className="form-inline" onSubmit={this.handleSubmit}>
 
@@ -130,6 +131,17 @@ export default class Form extends Component {
                 {this.state.success}
             </h2>
         }
+    </div>
+        {
+
+            this.state.success.length > 0 &&
+            <div className="box">
+            <h2>
+                {this.state.success}
+            </h2>
+            </div>
+        }
+
       </div>
     );
   }
