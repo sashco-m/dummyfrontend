@@ -12,12 +12,19 @@ export default class Form extends Component {
       toCurrency: 'USD',
       fromCurrency: 'CAD',
       userId: '',
-      valueDate: 'Closest Business Day + 1',
+      valueDate: 'Closest Business Day',
       purpose: 'ex. purpose 1',
-      success:''
+      success:'false',
+      orderId:'',
+      message:'',
+      convertedAmount:'',
+      rate:'',
+      submitSuccess:'false',
     };
-    this.handleSubmit = this.handleSubmit.bind(this);
+    this.handlePlaceOrder = this.handlePlaceOrder.bind(this);
+    this.handleOrderSubmit = this.handleOrderSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.handleRefresh = this.handleRefresh.bind(this);
   }
 
   handleChange(event) {
@@ -29,7 +36,7 @@ export default class Form extends Component {
     console.log(this.state);
   }
 
-  async handleSubmit(event) {
+  async handlePlaceOrder(event) {
     event.preventDefault();
     const { outPocket, inPocket, amount, toCurrency, fromCurrency, userId, valueDate, purpose, success } = this.state;
     await axios.post(
@@ -45,13 +52,67 @@ export default class Form extends Component {
         valueDate:`${valueDate}`,
         purpose:`${purpose}`
     }
-    ).then((response) => {
+    ).then( async (response) => {
         console.log(response);
         console.log(response.data.orderId);
-        this.setState({success:"Order Id" + response.data.orderId + " placed successfully."});
+        this.setState({orderId:`${response.data.orderId}`});
+        this.setState({message:"Order Id" + response.data.orderId + " placed successfully."});
+        this.setState({success:"true"});
+        //add quote
+        await this.getQuote();
 
     }).catch((err)=>{
-        this.setState({success:"missing fields"});
+        this.setState({message:"missing fields"});
+    });
+  }
+
+  async handleRefresh(event){
+    event.preventDefault();
+    await this.getQuote();
+  }
+
+  async getQuote(){
+    const {amount, toCurrency, fromCurrency} = this.state;
+    await axios.post(
+        'https://qnob3fk5jk.execute-api.ca-central-1.amazonaws.com/dev/quote',
+        {
+          amount:`${amount}`,
+          toCurrency:`${toCurrency}`,
+          fromCurrency:`${fromCurrency}`,
+          isFromAmount:"false",
+      }
+      ).then((response) => {
+          console.log(response);
+          this.setState({convertedAmount:`${response.data[0]}`});
+          this.setState({rate:`${response.data[2]}`});
+      }).catch((err)=>{
+          this.setState({message:"quote failed"});
+      });
+  }
+
+  async handleOrderSubmit(event) {
+    event.preventDefault();
+    const { outPocket, inPocket, amount, toCurrency, fromCurrency, userId, valueDate, purpose, success, orderId } = this.state;
+    await axios.put(
+      'https://qnob3fk5jk.execute-api.ca-central-1.amazonaws.com/dev/order/submitOrder',
+      {
+        outPocket:`${outPocket}`,
+        inPocket:`${inPocket}`,
+        amount:`${amount}`,
+        toCurrency:`${toCurrency}`,
+        fromCurrency:`${fromCurrency}`,
+        isFromAmount:"false",
+        userId:`${userId}`,
+        valueDate:`${valueDate}`,
+        purpose:`${purpose}`,
+        orderId:`${orderId}`
+    }
+    ).then((response) => {
+        console.log(response);
+        this.setState({submitSuccess:"true"});
+        this.setState({message:"order complete"});
+    }).catch((err)=>{
+        this.setState({message:"missing fields"});
     });
   }
 
@@ -59,7 +120,7 @@ export default class Form extends Component {
     return (
         <div className="outer">
       <div className="box">
-        <form className="form-inline" onSubmit={this.handleSubmit}>
+        <form className="form-inline" onSubmit={this.handlePlaceOrder}>
 
           <label>Out Pocket:</label>
           <input
@@ -126,18 +187,22 @@ export default class Form extends Component {
         </form>
 
         {
-            this.state.success.length > 0 &&
+            this.state.message.length > 0 &&
             <h2>
-                {this.state.success}
+                {this.state.message}
             </h2>
         }
     </div>
         {
 
-            this.state.success.length > 0 &&
+            (this.state.success == 'true' && this.state.submitSuccess == 'false') &&
             <div className="box">
-                <h2>Quote</h2>
-
+               <span><button onClick={this.handleRefresh}>Refresh Quote</button></span>
+               <span><h2>Quote</h2>{ this.state.convertedAmount}</span>
+               <span><h2>Rate</h2>{ this.state.rate}</span>
+            <form className="form-inline" onSubmit={this.handleOrderSubmit}>
+                <button type="submit">Submit Order (Final)</button>
+            </form>
             </div>
         }
 
