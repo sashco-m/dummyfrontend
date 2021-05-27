@@ -63,6 +63,25 @@ export default function Order() {
     await getQuote();
   }
 
+  async function handleDelete(event){
+      event.preventDefault();
+
+      const newOrder = order;
+      newOrder.currentStatus = "Deleted";
+      setOrder(newOrder);
+
+      await axios.put(
+        `https://qnob3fk5jk.execute-api.ca-central-1.amazonaws.com/dev/order/demoDeleteOrder/${id}`
+      ).then((response) => {
+            console.log(response);
+            setSubmitted(true);
+      }).catch((err)=>{
+          console.log(err);
+
+      });
+      return;
+  }
+
   async function getQuote(){
 
     await axios.post(
@@ -140,6 +159,9 @@ export default function Order() {
       {
           (order.currentStatus == "Pending Review" && !submitted) && (
               <div className="box">
+                  <form className="form-inline" onSubmit={handleDelete}>
+                    <button type="submit">Delete/Cancel Order</button>
+                  </form>
                   <form className="form-inline" onSubmit={handleOrderSubmit}>
                     <label>Out Pocket:</label>
                     <input
