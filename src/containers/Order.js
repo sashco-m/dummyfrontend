@@ -9,6 +9,17 @@ export default function Order() {
     const [order, setOrder] = useState({});
     const [transaction, setTransaction] = useState({});
     const [submitted, setSubmitted] = useState(false);
+    const [convertedAmount, setConvertedAmount] = useState('');
+    const [rate, setRate] = useState('');
+
+    //updating if status is pending review
+    const [newToCurrency, setNewToCurrency] = useState('');
+    const [newFromCurrency, setNewFromCurrency] = useState('');
+    const [newAmount, setNewAmount] = useState('');
+    const [newOutPocket, setNewOutPocket] = useState('');
+    const [newInPocket, setNewInPocket] = useState('');
+    const [newValueDate, setNewValueDate] = useState('');
+    const [newPurpose, setNewPurpose] = useState('');
 
   useEffect(() => {
     async function loadOrder() {
@@ -19,6 +30,13 @@ export default function Order() {
               console.log(response.data);
               //add to hooks
               setOrder(response.data);
+              setNewToCurrency(response.data.toCurrency);
+              setNewFromCurrency(response.data.fromCurrency);
+              setNewAmount(response.data.amount);
+              setNewOutPocket(response.data.outPocket);
+              setNewInPocket(response.data.inPocket);
+              setNewValueDate(response.data.valueDate);
+              setNewPurpose(response.data.purpose);
               return response.data;
           }).catch((err)=>{
               console.log(err);
@@ -40,6 +58,30 @@ export default function Order() {
     onLoad();
   }, [id]);
 
+  async function handleRefresh(event){
+    event.preventDefault();
+    await getQuote();
+  }
+
+  async function getQuote(){
+
+    await axios.post(
+        'https://qnob3fk5jk.execute-api.ca-central-1.amazonaws.com/dev/quote',
+        {
+          amount:`${newAmount}`,
+          toCurrency:`${newToCurrency}`,
+          fromCurrency:`${newFromCurrency}`,
+          isFromAmount:`${order.isFromAmount}`,
+      }
+      ).then((response) => {
+          console.log(response);
+          setConvertedAmount(`${response.data[0]}`);
+          setRate(`${response.data[2]}`);
+      }).catch((err)=>{
+          console.log(err);
+      });
+  }
+
   async function handleOrderSubmit(event) {
 
     event.preventDefault();
@@ -49,15 +91,15 @@ export default function Order() {
       await axios.put(
         'https://qnob3fk5jk.execute-api.ca-central-1.amazonaws.com/dev/order/submitOrder',
         {
-          outPocket:`${order.outPocket}`,
-          inPocket:`${order.inPocket}`,
-          amount:`${order.amount}`,
-          toCurrency:`${order.toCurrency}`,
-          fromCurrency:`${order.fromCurrency}`,
+          outPocket:`${newOutPocket}`,
+          inPocket:`${newInPocket}`,
+          amount:`${newAmount}`,
+          toCurrency:`${newToCurrency}`,
+          fromCurrency:`${newFromCurrency}`,
           isFromAmount:`${order.isFromAmount}`,
           userId:`${order.creatorId}`,
-          valueDate:`${order.valueDate}`,
-          purpose:`${order.purpose}`,
+          valueDate:`${newValueDate}`,
+          purpose:`${newPurpose}`,
           orderId:`${order.orderId}`
       }
       ).then((response) => {
@@ -77,7 +119,8 @@ export default function Order() {
 
   return (
     <div className="Notes">
-      {order && (
+
+      {(order && order.currentStatus != "Pending Review") && (
           //show order/txn info and submit button
         <div className="box">
             <div className="form-inline">
@@ -97,10 +140,69 @@ export default function Order() {
       {
           (order.currentStatus == "Pending Review" && !submitted) && (
               <div className="box">
-                <div>Order is not yet submitted.</div>
-                <form className="form-inline" onSubmit={handleOrderSubmit}>
+                  <form className="form-inline" onSubmit={handleOrderSubmit}>
+                    <label>Out Pocket:</label>
+                    <input
+                    type="text"
+                    name="outPocket"
+                    onChange={e => setNewOutPocket(e.target.value)}
+                    value={newOutPocket}
+                    />
+
+                    <label>in Pocket:</label>
+                    <input
+                    type="text"
+                    name="inPocket"
+                    onChange={e => setNewInPocket(e.target.value)}
+                    value={newInPocket}
+                    />
+
+                    <label>Amount:</label>
+                    <input
+                    type="text"
+                    name="amount"
+                    onChange={e => setNewAmount(e.target.value)}
+                    value={newAmount}
+                    />
+
+                    <label>Trade Currency:</label>
+                    <select name="toCurrency" value={newToCurrency} onChange={e => setNewToCurrency(e.target.value)}>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="AUD">AUD</option>
+                    </select>
+
+                    <label>Settlement Currency:</label>
+                    <select name="fromCurrency" value={newFromCurrency} onChange={e => setNewFromCurrency(e.target.value)}>
+                    <option value="CAD">CAD</option>
+                    <option value="USD">USD</option>
+                    <option value="EUR">EUR</option>
+                    <option value="AUD">AUD</option>
+                    </select>
+
+                    <label>Debit Date:</label>
+                    <select name="valueDate" value={newValueDate} onChange={e => setNewValueDate(e.target.value)}>
+                    <option value="Closest Business Day">Closest Business Day</option>
+                    <option value="Closest Business Day + 1">Closest Business Day + 1</option>
+                    <option value="Closest Business Day + 2">Closest Business Day + 2</option>
+                    </select>
+
+                    <label>Purpose:</label>
+                    <select name="purpose" value={newPurpose} onChange={e => setNewPurpose(e.target.value)}>
+                    <option value="ex. purpose 1">ex. purpose 1</option>
+                    <option value="ex. purpose 2">ex. purpose 2</option>
+                    <option value="ex. purpose 3">ex. purpose 3</option>
+                    </select>
+
                     <button type="submit">Submit Order (Final)</button>
-                </form>
+                    <span><button type="submit">Submit Order (Final)</button></span>
+                    </form>
+
+
+                <div>Order is not yet submitted.</div>
+                <span><button onClick={handleRefresh}>Refresh Quote</button></span>
+                <span><h2>Quote</h2>{convertedAmount}</span>
+                <span><h2>Rate</h2>{rate}</span>
               </div>
           )
       }
