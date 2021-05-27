@@ -2,7 +2,7 @@ import React, { useState, useEffect, Component } from "react";
 import { LinkContainer } from "react-router-bootstrap";
 import axios from 'axios';
 import './Home.css';
-import { useHistory } from "react-router-dom";
+import { useHistory, Link } from "react-router-dom";
 
 export default class Home extends Component {
   constructor(props) {
@@ -15,6 +15,7 @@ export default class Home extends Component {
     this.handleOrderSubmit = this.handleOrderSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
   }
+
 
   handleChange(event) {
     const inputValue = event.target.value;
@@ -80,31 +81,25 @@ export default class Home extends Component {
       {
 
         (this.state.success == 'true' &&
-<<<<<<< HEAD
         this.state.data.map((item,i) =>
 
         <li key={i}>Test</li>)) &&
 
-=======
-        this.state.data.map((item,i) => 
-        
-        <li key={i}>Test</li>)) && 
-
         <h2>Showing {this.state.data.length} orders:</h2> &&
-        
->>>>>>> 07fda864c84c13890ca1717617dc9b685c15650c
+
         this.state.data.map(function(item, i){
           console.log('test');
           console.log(`${item.purpose}`);
           return (
 
-
+            <LinkContainer key={item.orderId} to={`/order/${item.orderId}`}>
             <div className='order'>
             <h3>Id: {item.orderId}</h3>
             <p>inPocket: {item.outPocket} outPocket: {item.inPocket}</p>
             <p>Amount: {item.amount} {item.fromCurrency}</p>
             <h4>{item.currentStatus}</h4>
             </div>
+            </LinkContainer>
         )})
 
         }
