@@ -82,7 +82,7 @@ export default class Form extends Component {
           isFromAmount:"false",
       }
       ).then((response) => {
-          console.log(response);
+          //console.log(response);
           this.setState({convertedAmount:`${response.data[0]}`});
           this.setState({rate:`${response.data[2]}`});
       }).catch((err)=>{

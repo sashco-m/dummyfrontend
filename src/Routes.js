@@ -18,9 +18,7 @@ export default function Routes() {
       <Route exact path="/placeOrder">
         <Form />
       </Route>
-      <Route exact path='/order/:id'>
-        <Order />
-      </Route>
+      
       {/* Finally, catch all unmatched routes */}
       <Route>
         <NotFound />
