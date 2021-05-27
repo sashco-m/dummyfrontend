@@ -9,6 +9,8 @@ export default class Home extends Component {
     super(props);
     this.state = {
       userId: '',
+      success: false,
+      message: '',
       data: [],
     };
 
@@ -26,15 +28,6 @@ export default class Home extends Component {
     console.log(this.state);
   }
 
-  displayOrder(order) {
-    return (
-      <div className='order'>
-        <h3>/hi</h3>
-        <p>{order.day}</p>
-      </div>
-    )
-  }
-
   async handleOrderSubmit(event) {
     event.preventDefault();
     const { userId } = this.state;
@@ -43,16 +36,9 @@ export default class Home extends Component {
       `https://qnob3fk5jk.execute-api.ca-central-1.amazonaws.com/dev/order/demoGetOrder/${userId}`
     ).then((response) => {
         console.log(response.data[0]);
-        this.setState({submitSuccess:"true"});
+        this.setState({success:true});
         this.setState({message:"order complete"});
-        response.data.map((item, index) => {
-          console.log(response.data[index].orderId);
 
-          return (
-            <h1>hi</h1>
-          )
-        })
-        this.setState({success:"true"});
         this.setState({data:response.data});
         console.log(this.state.success);
 
@@ -80,7 +66,7 @@ export default class Home extends Component {
 
       {
 
-        (this.state.success == 'true' &&
+        (this.state.success == true &&
         this.state.data.map((item,i) =>
 
         <li key={i}>Test</li>)) &&
@@ -90,6 +76,7 @@ export default class Home extends Component {
         this.state.data.map(function(item, i){
           console.log('test');
           console.log(`${item.purpose}`);
+
           return (
 
             <LinkContainer key={item.orderId} to={`/order/${item.orderId}`}>
