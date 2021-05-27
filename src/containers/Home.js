@@ -7,20 +7,7 @@ export default class Home extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      outPocket: '',
-      inPocket: '',
-      amount: '',
-      toCurrency: 'USD',
-      fromCurrency: 'CAD',
       userId: '',
-      valueDate: 'Closest Business Day',
-      purpose: 'ex. purpose 1',
-      success:'false',
-      orderId:'',
-      message:'',
-      convertedAmount:'',
-      rate:'',
-      success:'false',
       data: [],
     };
 
@@ -94,7 +81,9 @@ export default class Home extends Component {
         (this.state.success == 'true' &&
         this.state.data.map((item,i) => 
         
-        <li key={i}>Test</li>)) &&
+        <li key={i}>Test</li>)) && 
+
+        <h2>Showing {this.state.data.length} orders:</h2> &&
         
         this.state.data.map(function(item, i){
           console.log('test');
