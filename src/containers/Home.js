@@ -2,6 +2,7 @@ import React, { useState, useEffect, Component } from "react";
 import { LinkContainer } from "react-router-bootstrap";
 import axios from 'axios';
 import './Home.css';
+import { useHistory } from "react-router-dom";
 
 export default class Home extends Component {
   constructor(props) {
@@ -92,16 +93,16 @@ export default class Home extends Component {
       {
 
         (this.state.success == 'true' &&
-        this.state.data.map((item,i) => 
-        
+        this.state.data.map((item,i) =>
+
         <li key={i}>Test</li>)) &&
-        
+
         this.state.data.map(function(item, i){
           console.log('test');
           console.log(`${item.purpose}`);
           return (
-          
-          
+
+
             <div className='order'>
             <h3>Id: {item.orderId}</h3>
             <p>inPocket: {item.outPocket} outPocket: {item.inPocket}</p>
@@ -109,7 +110,7 @@ export default class Home extends Component {
             <h4>{item.currentStatus}</h4>
             </div>
         )})
-        
+
         }
 
     </div>
