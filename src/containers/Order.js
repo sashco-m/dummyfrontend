@@ -195,7 +195,6 @@ export default function Order() {
                     </select>
 
                     <button type="submit">Submit Order (Final)</button>
-                    <span><button type="submit">Submit Order (Final)</button></span>
                     </form>
 
 
