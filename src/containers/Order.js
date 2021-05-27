@@ -199,12 +199,10 @@ export default function Order() {
 
 
                 <div>Order is not yet submitted.</div>
+                <span><button type="submit">Submit Order (Final)</button></span>
                 <span><button onClick={handleRefresh}>Refresh Quote</button></span>
                 <span><h2>Quote</h2>{convertedAmount}</span>
                 <span><h2>Rate</h2>{rate}</span>
-
-
-                <span><button type="submit">Submit Order (Final)</button></span>
               </div>
           )
       }
