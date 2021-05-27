@@ -9,6 +9,8 @@ export default function Order() {
     const [order, setOrder] = useState({});
     const [transaction, setTransaction] = useState({});
     const [submitted, setSubmitted] = useState(false);
+    const [convertedAmount, setConvertedAmount] = useState('');
+    const [rate, setRate] = useState('');
 
   useEffect(() => {
     async function loadOrder() {
@@ -39,6 +41,30 @@ export default function Order() {
 
     onLoad();
   }, [id]);
+
+  async function handleRefresh(event){
+    event.preventDefault();
+    await getQuote();
+  }
+
+  async function getQuote(){
+
+    await axios.post(
+        'https://qnob3fk5jk.execute-api.ca-central-1.amazonaws.com/dev/quote',
+        {
+          amount:`${order.amount}`,
+          toCurrency:`${order.toCurrency}`,
+          fromCurrency:`${order.fromCurrency}`,
+          isFromAmount:`${order.isFromAmount}`,
+      }
+      ).then((response) => {
+          console.log(response);
+          setConvertedAmount(`${response.data[0]}`);
+          setRate(`${response.data[2]}`);
+      }).catch((err)=>{
+          console.log(err);
+      });
+  }
 
   async function handleOrderSubmit(event) {
 
@@ -98,8 +124,11 @@ export default function Order() {
           (order.currentStatus == "Pending Review" && !submitted) && (
               <div className="box">
                 <div>Order is not yet submitted.</div>
+                <span><button onClick={handleRefresh}>Refresh Quote</button></span>
+                <span><h2>Quote</h2>{convertedAmount}</span>
+                <span><h2>Rate</h2>{rate}</span>
                 <form className="form-inline" onSubmit={handleOrderSubmit}>
-                    <button type="submit">Submit Order (Final)</button>
+                <button type="submit">Submit Order (Final)</button>
                 </form>
               </div>
           )
