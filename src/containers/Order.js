@@ -26,6 +26,10 @@ export default function Order() {
     const [creditId, setCreditId] = useState('');
     const [txn, setTxn] = useState({});
 
+    //savings
+    const [feesSaved, setFeesSaved] = useState('');
+    const [marginSaved, setMarginSaved] = useState('');
+
   useEffect(() => {
     async function loadOrder() {
 
@@ -122,6 +126,8 @@ export default function Order() {
           console.log(response);
           setConvertedAmount(`${response.data[0]}`);
           setRate(`${response.data[2]}`);
+          setMarginSaved(`${response.data[3]}`);
+          setFeesSaved(`${response.data[4]}`);
       }).catch((err)=>{
           console.log(err);
       });
@@ -259,6 +265,8 @@ export default function Order() {
                 <span><button onClick={handleRefresh}>Refresh Quote</button></span>
                 <span><h2>Quote</h2>{convertedAmount}</span>
                 <span><h2>Rate</h2>{rate}</span>
+                <span><h2>Fee</h2>$10</span>
+                <span><h2>Fee + Margin Savings</h2>${feesSaved} + ${marginSaved} = ${parseInt(feesSaved)+parseInt(marginSaved)}</span>
               </div>
           )
       }

@@ -20,6 +20,8 @@ export default class Form extends Component {
       convertedAmount:'',
       rate:'',
       submitSuccess:'false',
+      marginSaved:'',
+      feesSaved:''
     };
     this.handlePlaceOrder = this.handlePlaceOrder.bind(this);
     this.handleOrderSubmit = this.handleOrderSubmit.bind(this);
@@ -85,6 +87,8 @@ export default class Form extends Component {
           //console.log(response);
           this.setState({convertedAmount:`${response.data[0]}`});
           this.setState({rate:`${response.data[2]}`});
+          this.setState({marginSaved:`${response.data[3]}`});
+          this.setState({feesSaved:`${response.data[4]}`});
       }).catch((err)=>{
           this.setState({message:"quote failed"});
       });
@@ -200,6 +204,8 @@ export default class Form extends Component {
                <span><button onClick={this.handleRefresh}>Refresh Quote</button></span>
                <span><h2>Quote</h2>{ this.state.convertedAmount}</span>
                <span><h2>Rate</h2>{ this.state.rate}</span>
+               <span><h2>Fee</h2>$10</span>
+               <span><h2>Fee + Margin Savings</h2>${ this.state.feesSaved} + ${this.state.marginSaved} = ${parseInt(this.state.feesSaved)+parseInt(this.state.marginSaved)}</span>
             <form className="form-inline" onSubmit={this.handleOrderSubmit}>
                 <button type="submit">Submit Order (Final)</button>
             </form>
