@@ -6,8 +6,8 @@ export default class Form extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      outPocket: '',
-      inPocket: '',
+      outPocket: '456',
+      inPocket: '123',
       amount: '',
       toCurrency: 'USD',
       fromCurrency: 'CAD',
@@ -125,44 +125,39 @@ export default class Form extends Component {
         <div className="outer">
       <div className="box">
         <form className="form-inline" onSubmit={this.handlePlaceOrder}>
-
-          <label>Out Pocket:</label>
-          <input
-            type="text"
-            name="outPocket"
-            onChange={this.handleChange}
-            value={this.state.outPocket}
-          />
-
-          <label>in Pocket:</label>
-          <input
-            type="text"
-            name="inPocket"
-            onChange={this.handleChange}
-            value={this.state.inPocket}
-          />
-
-          <label>userId:</label>
+        <label>userId:</label>
           <input
             type="text"
             name="userId"
             onChange={this.handleChange}
             value={this.state.userId}
           />
+            <h3>I want to pay</h3>
+          <select name="inPocket" value={this.state.inPocket} onChange={this.handleChange}>
+            <option value="123">Supplier 1</option>
+            <option value="321">Supplier 2</option>
+            <option value="999">Supplier 3</option>
+          </select>
 
-          <label>Amount:</label>
+          <h3>Amount</h3>
           <input
-            type="text"
+            type="number"
             name="amount"
             onChange={this.handleChange}
             value={this.state.amount}
           />
-
-          <label>Trade Currency:</label>
           <select name="toCurrency" value={this.state.toCurrency} onChange={this.handleChange}>
             <option value="USD">USD</option>
             <option value="EUR">EUR</option>
             <option value="AUD">AUD</option>
+          </select>
+
+          <h3>From Pocket</h3>
+          <select name="outPocket" value={this.state.outPocket} onChange={this.handleChange}>
+            <option value="456">CAD Pocket</option>
+            <option value="654">EUR Pocket</option>
+            <option value="888">USD Pocket</option>
+            <option value="777">AUD Pocket</option>
           </select>
 
           <label>Settlement Currency:</label>
