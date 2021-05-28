@@ -50,27 +50,13 @@ export default function Order() {
               if(response.data.currentStatus == "Pending Completion"){
                 setDebitId(response.data.debitId);
                 setCreditId(response.data.creditId);
+                console.log("debit id: "+response.data.debitId);
               }
               return response.data;
           }).catch((err)=>{
               console.log(err);
               return "oops";
           });
-    }
-    async function loadTxn() {
-        if(order.currentStatus == 'Pending Completion'){
-            await axios.get(
-                `https://qnob3fk5jk.execute-api.ca-central-1.amazonaws.com/dev/transaction/demoGetTransactionById/${debitId}`
-              ).then((response) => {
-                  console.log(response.data);
-                  //add to hooks
-                  setTxn(response.data);
-                  return response.data;
-              }).catch((err)=>{
-                  console.log(err);
-                  return "oops";
-              });
-        }
     }
 
     async function onLoad() {
@@ -79,7 +65,6 @@ export default function Order() {
         //add note to hooks
         console.log(test);
         console.log(order);
-        const test2 = await loadTxn();
       } catch (e) {
         onError(e);
       }
@@ -91,6 +76,27 @@ export default function Order() {
   async function handleRefresh(event){
     event.preventDefault();
     await getQuote();
+  }
+
+  async function loadTxn() {
+    if(order.currentStatus == 'Pending Completion'){
+        await axios.get(
+            `https://qnob3fk5jk.execute-api.ca-central-1.amazonaws.com/dev/transaction/demoGetTransactionById/${debitId}`
+          ).then((response) => {
+              console.log(response.data);
+              //add to hooks
+              setTxn(response.data);
+              return response.data;
+          }).catch((err)=>{
+              console.log(err);
+              return "oops";
+          });
+    }
+}
+
+  async function handleTxnStatus(event){
+      event.preventDefault();
+      await loadTxn();
   }
 
   async function handleDelete(event){
@@ -194,6 +200,7 @@ export default function Order() {
             <div className="form-inline">
                 <h3>Txn (shipping) status:</h3>
                 <div>{txn.currentStatus}</div>
+                <span><button onClick={handleTxnStatus}>Refresh Shipping Status</button></span>
             </div>
         </div>
       )}
