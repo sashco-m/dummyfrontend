@@ -201,6 +201,7 @@ export default function Order() {
                 <h3>Txn (shipping) status:</h3>
                 <div>{txn.currentStatus}</div>
                 <span><button onClick={handleTxnStatus}>Refresh Shipping Status</button></span>
+                <span><h2>Fee + Margin Savings</h2>$30 + ${newAmount*0.3} = ${30+newAmount*0.3}</span>
             </div>
         </div>
       )}
