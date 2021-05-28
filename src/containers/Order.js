@@ -21,6 +21,11 @@ export default function Order() {
     const [newValueDate, setNewValueDate] = useState('');
     const [newPurpose, setNewPurpose] = useState('');
 
+    //txn status
+    const [debitId, setDebitId] = useState('');
+    const [creditId, setCreditId] = useState('');
+    const [txn, setTxn] = useState({});
+
   useEffect(() => {
     async function loadOrder() {
 
@@ -37,11 +42,31 @@ export default function Order() {
               setNewInPocket(response.data.inPocket);
               setNewValueDate(response.data.valueDate);
               setNewPurpose(response.data.purpose);
+              //get leg id's
+              if(response.data.currentStatus == "Pending Completion"){
+                setDebitId(response.data.debitId);
+                setCreditId(response.data.creditId);
+              }
               return response.data;
           }).catch((err)=>{
               console.log(err);
               return "oops";
           });
+    }
+    async function loadTxn() {
+        if(order.currentStatus == 'Pending Completion'){
+            await axios.get(
+                `https://qnob3fk5jk.execute-api.ca-central-1.amazonaws.com/dev/transaction/demoGetTransactionById/${debitId}`
+              ).then((response) => {
+                  console.log(response.data);
+                  //add to hooks
+                  setTxn(response.data);
+                  return response.data;
+              }).catch((err)=>{
+                  console.log(err);
+                  return "oops";
+              });
+        }
     }
 
     async function onLoad() {
@@ -50,6 +75,7 @@ export default function Order() {
         //add note to hooks
         console.log(test);
         console.log(order);
+        const test2 = await loadTxn();
       } catch (e) {
         onError(e);
       }
@@ -153,6 +179,15 @@ export default function Order() {
                 <div>{order.fromCurrency}</div>
                 <h3>Trade Currency</h3>
                 <div>{order.toCurrency}</div>
+            </div>
+        </div>
+      )}
+      {(order && order.currentStatus == "Pending Completion") && (
+          //show txn status
+        <div className="box">
+            <div className="form-inline">
+                <h3>Txn (shipping) status:</h3>
+                <div>{txn.currentStatus}</div>
             </div>
         </div>
       )}
