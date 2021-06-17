@@ -22,6 +22,11 @@ function App() {
             Place an Order
           </Navbar.Brand>
         </LinkContainer>
+        <LinkContainer to="/quote">
+          <Navbar.Brand className="font-weight-bold text-muted">
+            Quote Test
+          </Navbar.Brand>
+        </LinkContainer>
       </Navbar>
       <Routes />
     </div>

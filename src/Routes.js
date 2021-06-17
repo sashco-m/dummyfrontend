@@ -9,6 +9,8 @@ import Form from './components/Form.js';
 
 import NotFound from "./containers/NotFound";
 
+import Quote from './containers/Quote';
+
 export default function Routes() {
   return (
     <Switch>
@@ -17,6 +19,9 @@ export default function Routes() {
       </Route>
       <Route exact path="/placeOrder">
         <Form />
+      </Route>
+      <Route exact path="/quote">
+        <Quote />
       </Route>
       <Route exact path="/order/:id">
         <Order />
