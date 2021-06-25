@@ -6,22 +6,28 @@ export default class Form extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      outPocket: '456',
-      inPocket: '123',
+      inBus:'9105181016286943',
+      outBus:'9105181081967583',
+      outPocket: '10162869432257133328',
+      inPocket: '10162869432150075627',
+      haveCurrency:'CAD',
+      wantCurrency:'USD',
       amount: '',
-      toCurrency: 'USD',
-      fromCurrency: 'CAD',
-      userId: '',
-      valueDate: 'Closest Business Day',
-      purpose: 'ex. purpose 1',
+      userId: '9105180098392512',
+      orderType: 'send',
+      isAmountHaveCurrency:true,
+      purpose:'ex purpose 1',
+      valueDate:'asap',
       success:'false',
       orderId:'',
+      orderNote:'Please leave a note.',
+
       message:'',
       convertedAmount:'',
+      weConvert:'',
+      fee:'',
       rate:'',
       submitSuccess:'false',
-      marginSaved:'',
-      feesSaved:''
     };
     this.handlePlaceOrder = this.handlePlaceOrder.bind(this);
     this.handleOrderSubmit = this.handleOrderSubmit.bind(this);
@@ -40,19 +46,23 @@ export default class Form extends Component {
 
   async handlePlaceOrder(event) {
     event.preventDefault();
-    const { outPocket, inPocket, amount, toCurrency, fromCurrency, userId, valueDate, purpose, success } = this.state;
+    const { outPocket, inPocket, amount, userId, valueDate, purpose, success, inBus, outBus, haveCurrency, wantCurrency, orderType, orderNote,isAmountHaveCurrency } = this.state;
     await axios.post(
       'https://qnob3fk5jk.execute-api.ca-central-1.amazonaws.com/dev/order/placeOrder',
       {
-        outPocket:`${outPocket}`,
-        inPocket:`${inPocket}`,
-        amount:`${amount}`,
-        toCurrency:`${toCurrency}`,
-        fromCurrency:`${fromCurrency}`,
-        isFromAmount:"false",
-        userId:`${userId}`,
-        valueDate:`${valueDate}`,
-        purpose:`${purpose}`
+          outPocket:`${outPocket}`,
+          inPocket:`${inPocket}`,
+          outBusinessId:`${outBus}`,
+          inBusinessId:`${inBus}`,
+          haveCurrency:`${haveCurrency}`,
+          wantCurrency:`${wantCurrency}`,
+          orderType:`${orderType}`,
+          userId: `${userId}`,
+          amount: amount,
+          isAmountHaveCurrency:`${isAmountHaveCurrency}`,
+          valueDate:`${valueDate}`,
+          purpose:`${purpose}`,
+          orderNote:`${orderNote}`
     }
     ).then( async (response) => {
         console.log(response);
@@ -74,22 +84,25 @@ export default class Form extends Component {
   }
 
   async getQuote(){
-    const {amount, toCurrency, fromCurrency} = this.state;
+    const {amount, wantCurrency, haveCurrency, isAmountHaveCurrency, toPocket} = this.state;
     await axios.post(
         'https://qnob3fk5jk.execute-api.ca-central-1.amazonaws.com/dev/quote',
         {
           amount:`${amount}`,
-          toCurrency:`${toCurrency}`,
-          fromCurrency:`${fromCurrency}`,
-          isFromAmount:"false",
+          wantCurrency:`${wantCurrency}`,
+          haveCurrency:`${haveCurrency}`,
+          isAmountHaveCurrency:`${isAmountHaveCurrency}`,
+          toPocket: `${toPocket}`
       }
       ).then((response) => {
-          //console.log(response);
-          this.setState({convertedAmount:`${response.data[0]}`});
-          this.setState({rate:`${response.data[2]}`});
-          this.setState({marginSaved:`${response.data[3]}`});
-          this.setState({feesSaved:`${response.data[4]}`});
+          console.log(response);
+          //fill all the state hooks
+          this.setState({fee: response.data.fee});
+          this.setState({convertedAmount: response.data.converted});
+          this.setState({rate: response.data.rate});
+          this.setState({weConvert: response.data.weConvert});
       }).catch((err)=>{
+          console.log(err);
           this.setState({message:"quote failed"});
       });
   }
@@ -100,16 +113,8 @@ export default class Form extends Component {
     await axios.put(
       'https://qnob3fk5jk.execute-api.ca-central-1.amazonaws.com/dev/order/submitOrder',
       {
-        outPocket:`${outPocket}`,
-        inPocket:`${inPocket}`,
-        amount:`${amount}`,
-        toCurrency:`${toCurrency}`,
-        fromCurrency:`${fromCurrency}`,
-        isFromAmount:"false",
-        userId:`${userId}`,
-        valueDate:`${valueDate}`,
-        purpose:`${purpose}`,
-        orderId:`${orderId}`
+        userId: userId,
+        orderId: orderId
     }
     ).then((response) => {
         console.log(response);
@@ -132,11 +137,23 @@ export default class Form extends Component {
             onChange={this.handleChange}
             value={this.state.userId}
           />
+          <label>BusinessId:</label>
+          <input
+            type="text"
+            name="outBus"
+            onChange={this.handleChange}
+            value={this.state.outBus}
+          />
             <h3>I want to pay</h3>
-          <select name="inPocket" value={this.state.inPocket} onChange={this.handleChange}>
+          <select name="inBus" value={this.state.inBus} onChange={this.handleChange}>
             <option value="123">Supplier 1</option>
             <option value="321">Supplier 2</option>
             <option value="999">Supplier 3</option>
+          </select>
+          <select name="wantCurrency" value={this.state.wantCurrency} onChange={this.handleChange}>
+            <option value="CAD">CAD pocket</option>
+            <option value="USD">USD pocket</option>
+            <option value="EUR">EUR pocket</option>
           </select>
 
           <h3>Amount</h3>
@@ -146,33 +163,13 @@ export default class Form extends Component {
             onChange={this.handleChange}
             value={this.state.amount}
           />
-          <select name="toCurrency" value={this.state.toCurrency} onChange={this.handleChange}>
-            <option value="USD">USD</option>
-            <option value="EUR">EUR</option>
-            <option value="AUD">AUD</option>
-          </select>
 
           <h3>From Pocket</h3>
-          <select name="outPocket" value={this.state.outPocket} onChange={this.handleChange}>
-            <option value="456">CAD Pocket</option>
-            <option value="654">EUR Pocket</option>
-            <option value="888">USD Pocket</option>
-            <option value="777">AUD Pocket</option>
-          </select>
-
-          <label>Settlement Currency:</label>
-          <select name="fromCurrency" value={this.state.fromCurrency} onChange={this.handleChange}>
-            <option value="CAD">CAD</option>
-            <option value="USD">USD</option>
-            <option value="EUR">EUR</option>
-            <option value="AUD">AUD</option>
-          </select>
-
-          <label>Debit Date:</label>
-          <select name="valueDate" value={this.state.valueDate} onChange={this.handleChange}>
-            <option value="Closest Business Day">Closest Business Day</option>
-            <option value="Closest Business Day + 1">Closest Business Day + 1</option>
-            <option value="Closest Business Day + 2">Closest Business Day + 2</option>
+          <select name="haveCurrency" value={this.state.haveCurrency} onChange={this.handleChange}>
+            <option value="CAD">CAD Pocket</option>
+            <option value="EUR">EUR Pocket</option>
+            <option value="USD">USD Pocket</option>
+            <option value="AUD">AUD Pocket</option>
           </select>
 
           <label>Purpose:</label>
@@ -181,6 +178,14 @@ export default class Form extends Component {
             <option value="ex. purpose 2">ex. purpose 2</option>
             <option value="ex. purpose 3">ex. purpose 3</option>
           </select>
+
+          <label>order Note:</label>
+          <input
+            type="text"
+            name="orderNote"
+            onChange={this.handleChange}
+            value={this.state.orderNote}
+          />
 
           <button type="submit">Place Order</button>
         </form>
@@ -196,11 +201,12 @@ export default class Form extends Component {
 
             (this.state.success == 'true' && this.state.submitSuccess == 'false') &&
             <div className="box">
-               <span><button onClick={this.handleRefresh}>Refresh Quote</button></span>
-               <span><h2>Quote</h2>{ this.state.convertedAmount}</span>
-               <span><h2>Rate</h2>{ this.state.rate}</span>
-               <span><h2>Fee</h2>$10</span>
-               <span><h2>Fee + Margin Savings</h2>${ this.state.feesSaved} + ${this.state.marginSaved} = ${parseInt(this.state.feesSaved)+parseInt(this.state.marginSaved)}</span>
+               <p><button onClick={this.handleRefresh}>Refresh Quote</button></p>
+               <p>Amount: {this.state.amount} {this.state.haveCurrency}</p>
+               <p>Minus fee: {this.state.fee} {this.state.haveCurrency}</p>
+               <p>We convert: {this.state.weConvert} {this.state.haveCurrency}</p>
+               <p>With Rate: {this.state.rate}</p>
+                <p>final amount: {this.state.convertedAmount} {this.state.wantCurrency}</p>
             <form className="form-inline" onSubmit={this.handleOrderSubmit}>
                 <button type="submit">Submit Order (Final)</button>
             </form>

@@ -30,10 +30,10 @@ export default class Home extends Component {
 
   async handleOrderSubmit(event) {
     event.preventDefault();
-    const { userId } = this.state;
-    console.log("This is the user " + {userId})
+    const { busId } = this.state;
+    console.log("This is the user " + {busId})
     await axios.get(
-      `https://qnob3fk5jk.execute-api.ca-central-1.amazonaws.com/dev/order/demoGetOrder/${userId}`
+      `https://qnob3fk5jk.execute-api.ca-central-1.amazonaws.com/dev/dashboard/${busId}`
     ).then((response) => {
         console.log(response.data[0]);
         this.setState({success:true});
@@ -50,18 +50,18 @@ export default class Home extends Component {
   render() {
     return (
     <div className="Home">
-      <h1>View your Orders</h1>
-        <label>Enter UserId:</label>
+      <h1>Dashboard</h1>
+        <label>Enter BusinessId:</label>
             <input
               type="text"
               name="userId"
               onChange={this.handleChange}
-              value={this.state.userId}
+              value={this.state.busId}
             />
 
 
       <form className="view-order-form" onSubmit={this.handleOrderSubmit}>
-        <button type="submit">View Orders</button>
+        <button type="submit">Dashboard</button>
         </form>
 
       {
